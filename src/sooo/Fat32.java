@@ -214,6 +214,33 @@ public class Fat32 implements SistemaArquivos{
         }
         disco.escreveBloco(bloco, b.array());
     }
+    
+    public static String processFileName(String fileName) {
+        String splitedFileName[] = fileName.split("\\.");
+        try {
+            while (splitedFileName[0].length() != 8) {
+                if (splitedFileName[0].length() < 8) {
+                    splitedFileName[0] += "_";
+                } else if (splitedFileName[0].length() > 8) {
+                    splitedFileName[0] = splitedFileName[0].substring(0, 7);
+                }
+            }
+            while (splitedFileName[1].length() != 3) {
+                if (splitedFileName[1].length() < 8) {
+                    splitedFileName[1] += "_";
+                } else if (splitedFileName[1].length() > 3) {
+                    splitedFileName[1] = splitedFileName[1].substring(0, 2);
+                }
+            }
+        } catch (ArrayIndexOutOfBoundsException q) {
+            System.out.println("Nao ta rolando mané");
+        }
+        
+        String newName = splitedFileName[0] + "." + splitedFileName[1];
+        
+        return newName;
+        
+    }
 
     private class EntradaDiretorio {
         private String nomeArquivo;
