@@ -14,15 +14,37 @@ public class Fat32 implements SistemaArquivos{
     private final int QTD_BLOCOS_FAT = ((NUM_BLOCOS * 4) / TAM_BLOCOS) + 1;
     private DriverDisco disco;
     private Collection<EntradaDiretorio> diretorioRaiz = new ArrayList<EntradaDiretorio>();
-    
+
     public static void main(String[] args) throws IOException {
         Fat32 fat = new Fat32();
     }
-    
+
     private void casoTeste() {
-        
+
+      String newFile = "", fileName = "", fileExt = "",fileContent ="";
+      int fileSize, freeBlock, numBlock =1, offset limit;
+
+      Scanner scan = new Scanner(System.in);
+
+      System.out.println("File Name:    ");  fileName = scan.nextLine();
+      System.out.println("File Ext:     ");  fileExt = scan.nextLine();
+      System.out.println("File Content: ");  fileContent = scan.nextLine();
+
+      if(fileName.length() < 8)
+          while(fileName.length() < 8) fileName += " ";
+
+      if(fileExt.length() < 3)
+          while(fileExt.length() < 3) fileExt += " ";
+
+      newFile = fileName.substring(0, 8) + "." + fileExt.substring(0, 3);
+
+      byte[] data = fileContent.getBytes();
+
+      create(newFile, data);
+
     }
-    
+
+
     public Fat32() throws IOException {
         disco = new DriverDisco(TAM_BLOCOS, NUM_BLOCOS);
         if(!disco.isFormatado()){
@@ -32,10 +54,10 @@ public class Fat32 implements SistemaArquivos{
             leFAT();
         }
     }
-    
+
     @Override
     public void create(String fileName, byte[] data) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+
     }
 
     @Override
@@ -136,13 +158,13 @@ public class Fat32 implements SistemaArquivos{
         }
         disco.escreveBloco(bloco, b.array());
     }
-    
+
     private class EntradaDiretorio {
         private String nomeArquivo;
         private String extencaoArquivo;
         private int primeiroBloco;
         private int tamanho;
-        
+
     }
-    
+
 }
