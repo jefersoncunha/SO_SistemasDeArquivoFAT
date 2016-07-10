@@ -17,27 +17,19 @@ public class Fat32 implements SistemaArquivos{
 
     public static void main(String[] args) throws IOException {
         Fat32 fat = new Fat32();
+        casoTeste();
     }
 
     private void casoTeste() {
 
-      String newFile = "", fileName = "", fileExt = "",fileContent ="";
-      int fileSize, freeBlock, numBlock =1, offset limit;
-
       Scanner scan = new Scanner(System.in);
+      String fileContent ="";
+      int fileSize; int freeBlock; int numBlock =1; int offset; int limit;
 
-      System.out.println("File Name:    ");  fileName = scan.nextLine();
-      System.out.println("File Ext:     ");  fileExt = scan.nextLine();
-      System.out.println("File Content: ");  fileContent = scan.nextLine();
+      System.out.println("File Name: \n Ex: arquivo.txt ");
 
-      if(fileName.length() < 8)
-          while(fileName.length() < 8) fileName += " ";
-
-      if(fileExt.length() < 3)
-          while(fileExt.length() < 3) fileExt += " ";
-
-      newFile = fileName.substring(0, 8) + "." + fileExt.substring(0, 3);
-
+      fileContent = scan.nextLine();
+      fileContent = processFileName(fileContent);
       byte[] data = fileContent.getBytes();
 
       create(newFile, data);
@@ -57,7 +49,52 @@ public class Fat32 implements SistemaArquivos{
 
     @Override
     public void create(String fileName, byte[] data) {
+      System.out.println("###--- create(fileName,data) ---");
+      ByteBuffer dice = ByteBuffer.wrap(data);
+      int fileSize = dice.capacity();  // tamanho total do arquivo
+      int blockAmount = (fileSize/TAM_BLOCOS) + 1;  // quantidade de blocos que ele ocupa
+      int[] freeBlocks = new int[blockAmount];  // lista dos blocos que este arquivo vai ocupar
+      byte[] dataItem = new byte[TAM_BLOCOS];
 
+      try {
+          int freeBlock = disco.freeBlock();  // encontra um bloco livre
+
+          if(freeBlock <= 1 || freeBlock > NUM_BLOCOS)
+            throw new IllegalStateException("Bloco invalido");
+
+          EntradaDiretorio dir = new EntradaDiretorio();
+            dir.setNomeArquivo(fileName);
+            dir.setTamanho(fileSize);
+            dir.setPrimeiroBloco(freeBlock);
+            diretorioRaiz.add(dir);  // cria espaço no diretorio
+
+          if(fileSize > TAM_BLOCOS){  // se o arquivo ocupa mais de 1 bloco
+
+              for(int i=0; i<blockAmount; i++){
+                  freeBlocks[i] = freeBlock;
+                  freeBlock = disco.freeBlock();
+
+                  if(freeBlock <= 1 || freeBlock > NUM_BLOCOS)
+                    throw new IllegalStateException("Bloco invalido");
+
+                  FAT[freeBlocks[i]] = freeBlock;
+
+                  if(i == blockAmount-1)  // se for a ultima parte, le só a parte que falta
+                      System.arraycopy(dataItem, i * TAM_BLOCOS, dataItem, 0, (fileSize - (i * TAM_BLOCOS)));
+                   else
+                      System.arraycopy(dataItem, i * TAM_BLOCOS, dataItem, 0, TAM_BLOCOS);
+
+                  disco.escreveBloco(freeBlocks[i], dataItem);
+              }
+              FAT[freeBlocks[blockAmount-1]] = 0;
+          } else {
+              FAT[freeBlock] = 0;
+              disco.escreveBloco(freeBlock, data);
+          }
+          escreveDiretorio();
+          escreveFAT();
+
+      } catch (IOException ex) { }
     }
 
     @Override
@@ -116,6 +153,25 @@ public class Fat32 implements SistemaArquivos{
         }
     }
 
+    private void escreveDiretorio() throws IOException {
+        ByteBuffer b = ByteBuffer.allocate(TAM_BLOCOS);
+        int bloco = 0;
+        b.putInt(diretorioRaiz.size());
+        for(int i=0; i < diretorioRaiz.size(); i++){
+            for(int j=0; j<12; j++){
+                char c = diretorioRaiz.get(i).nomeArquivo.charAt(j);
+                b.putChar(c);
+            }
+            b.putInt(diretorioRaiz.get(i).tamanho);
+            b.putInt(diretorioRaiz.get(i).primeiroBloco);
+            if(b.position() == TAM_BLOCOS){
+                disco.escreveBloco(bloco, b.array());
+                bloco++;
+            }
+        }
+        disco.escreveBloco(bloco, b.array());
+    }
+
     private void criaDiretorio() throws IOException {
         ByteBuffer bbuffer = ByteBuffer.allocate(TAM_BLOCOS);
         bbuffer.putInt(0);
@@ -164,6 +220,30 @@ public class Fat32 implements SistemaArquivos{
         private String extencaoArquivo;
         private int primeiroBloco;
         private int tamanho;
+
+        public String getNomeArquivo() {
+            return nomeArquivo;
+        }
+
+        public void setNomeArquivo(String nomeArquivo) {
+            this.nomeArquivo = nomeArquivo;
+        }
+
+        public int getPrimeiroBloco() {
+            return primeiroBloco;
+        }
+
+        public void setPrimeiroBloco(int primeiroBloco) {
+            this.primeiroBloco = primeiroBloco;
+        }
+
+        public int getTamanho() {
+            return tamanho;
+        }
+
+        public void setTamanho(int tamanho) {
+            this.tamanho = tamanho;
+        }
 
     }
 
