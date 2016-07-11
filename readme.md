@@ -1,13 +1,10 @@
 Desenvolver uma classe em Java que implemente um **Sistema de Arquivos FAT 32** através da
 interface a seguir:
 
-
-
 ```
 #!java
 
 public interface SistemaArquivos {
-
     /**
      * Cria um novo arquivo.
      * @param fileName nome do arquivo para criar
@@ -51,7 +48,9 @@ os usuários operem o sistema de arquivos.
 Observações:
 * Deverá ser desenvolvido em linguagem Java utilizando a classe RandomAccessFile e a
 chamada seek(pos) para busca e leitura/gravação de blocos inteiros;
+
 * Os blocos serão de 64KB;
+
 * O tamanho do arquivo para armazenamento poderá ser definido na inicialização (caso
 o arquivo seja novo);
 
