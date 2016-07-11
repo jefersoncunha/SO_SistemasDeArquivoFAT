@@ -57,11 +57,10 @@ public class Fat32 implements SistemaArquivos{
 
         switch(option){
           case 1:{ createFile(); }
-          case 2:{ }
+          case 2:{ appendFile(); }
           case 3:{ }
           case 4:{ }
           case 5:{ showDirectory(); }
-          default: if(option != 0) System.out.println("Invalid Choice.");
         };
 
       }while(option != 0);
@@ -184,10 +183,10 @@ public class Fat32 implements SistemaArquivos{
         for(int i=0; i < quant; i++){
             EntradaDiretorio entr = new EntradaDiretorio();
             StringBuffer sb = new StringBuffer();
-            for(int j=0; j < 12; j++){
-                char c = bbuffer.getChar();
-                sb.append(c);
-            }
+             for(int j=0; j < 12; j++){
+                 char c = bbuffer.getChar();
+                    sb.append(c);
+             }
             entr.setNomeArquivo(sb.toString());
             entr.setTamanho(bbuffer.getInt());
             entr.setPrimeiroBloco(bbuffer.getInt());
@@ -262,7 +261,7 @@ public class Fat32 implements SistemaArquivos{
     public void createFile(){
       Scanner scan = new Scanner(System.in);
       String fileName ="", fileContent ="";
-      System.out.println("| File Name: \n Ex: arquivo.tx \n Digite o nome do Arquivo: ");
+      System.out.println("| File Name: \n| Ex: arquivo.tx \n| Digite o nome do Arquivo: ");
 
       fileName = scan.nextLine();
       fileName = processFileName(fileName);
@@ -274,41 +273,55 @@ public class Fat32 implements SistemaArquivos{
       create(fileName, data);
     }
 
-    
-        public static String processFileName(String fileName) {
-        char analyse[] = fileName.toCharArray();
-        boolean check = false;
-        for (char a : analyse) {
-            if (a == '.') {
-                check = true;
-            }
-        }
-        if (check == true) {
-            String splitedFileName[] = fileName.split("\\.");
-            try {
-                while (splitedFileName[0].length() != 8) {
-                    if (splitedFileName[0].length() < 8) {
-                        splitedFileName[0] += "_";
-                    } else if (splitedFileName[0].length() > 8) {
-                        splitedFileName[0] = splitedFileName[0].substring(0, 7);
-                    }
-                }
-                while (splitedFileName[1].length() != 3) {
-                    if (splitedFileName[1].length() < 3) {
-                        splitedFileName[1] += "_";
-                    } else if (splitedFileName[1].length() > 3) {
-                        splitedFileName[1] = splitedFileName[1].substring(0, 2);
-                    }
-                }
-            } catch (ArrayIndexOutOfBoundsException q) {
-                System.out.println("# processFileName() ERROR:");
-            }
-            String newName = splitedFileName[0] + "." + splitedFileName[1];
-            return newName;
-        }
-        else{
-            return "fail";
-        }
+    public void appendFile(){
+      Scanner scan = new Scanner(System.in);
+      String fileName ="", fileContent ="";
+      System.out.println("#------------ Append File: ------------ #");
+      System.out.println("| File Name: ");
+
+      scan.nextLine();
+      fileName = scan.nextLine();
+      System.out.println("Conteudo: ");
+      fileContent = scan.nextLine();
+
+      byte[] data = fileContent.getBytes();
+
+      append(fileName, data);
+    }
+
+
+    public static String processFileName(String fileName) {
+      char analyse[] = fileName.toCharArray();
+      boolean check = false;
+      for (char a : analyse) {
+          if (a == '.') {
+              check = true;
+          }
+      }
+      if (check == true) {
+          String splitedFileName[] = fileName.split("\\.");
+          try {
+              while (splitedFileName[0].length() != 8) {
+                  if (splitedFileName[0].length() < 8)
+                      splitedFileName[0] += "_";
+                  else if (splitedFileName[0].length() > 8)
+                      splitedFileName[0] = splitedFileName[0].substring(0, 7);
+              }
+              while (splitedFileName[1].length() != 3) {
+                  if (splitedFileName[1].length() < 3)
+                      splitedFileName[1] += "_";
+                  else if (splitedFileName[1].length() > 3)
+                      splitedFileName[1] = splitedFileName[1].substring(0, 3);
+              }
+          } catch (ArrayIndexOutOfBoundsException q) {
+              System.out.println("# processFileName() ERROR:");
+          }
+          String newName = splitedFileName[0] + "." + splitedFileName[1];
+          return newName;
+      }
+      else{
+          return "fail";
+      }
     }
 
     public void showDirectory(){
@@ -323,7 +336,7 @@ public class Fat32 implements SistemaArquivos{
       System.out.println("\n#------------ FAT Blocks: ------------ #");
       for(int i=0; i<NUM_BLOCOS; i++){
           if(FAT[i] != -1 )
-              System.out.println("FAT[" +i +"]: " +FAT[i]);
+              System.out.println("| FAT[" +i +"]: " +FAT[i]);
       }
 
     }
