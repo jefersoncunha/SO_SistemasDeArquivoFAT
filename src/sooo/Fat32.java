@@ -42,10 +42,8 @@ public class Fat32 implements SistemaArquivos{
     private void casoTeste() {
       int option;
       Scanner scan = new Scanner(System.in);
-
-      System.out.println("#------------ TEST CASE: ------------ #");
-
       do{
+        System.out.println("#------------ TEST CASE: ------------ #");
         System.out.println("| 1. Create ");
         System.out.println("| 2. Append");
         System.out.println("| 3. Read");
@@ -57,6 +55,7 @@ public class Fat32 implements SistemaArquivos{
 
         if(option ==1) createFile();
         else if(option ==2) appendFile();
+        else if(option ==7) append("12345678.txt","371286381736217361827361263781683".getBytes());
         else if(option ==5) showDirectory();
 
       }while(option != 0);
@@ -68,7 +67,6 @@ public class Fat32 implements SistemaArquivos{
 
     @Override
     public void create(String fileName, byte[] data) {
-      System.out.println("###--- create(fileName,data) ---");
       ByteBuffer dice = ByteBuffer.wrap(data);
       int fileSize = dice.capacity();  // tamanho total do arquivo
       int blockAmount = (fileSize/TAM_BLOCOS) + 1;  // quantidade de blocos que ele ocupa
@@ -257,7 +255,8 @@ public class Fat32 implements SistemaArquivos{
     public void createFile(){
       Scanner scan = new Scanner(System.in);
       String fileName ="", fileContent ="";
-      System.out.println("| File Name: \n| Ex: arquivo.tx \n| Digite o nome do Arquivo: ");
+      System.out.println("#------------ Create File: ------------ #");
+      System.out.println("| File Name: \n| Ex: arquivo.tx \n| Insert: ");
 
       fileName = scan.nextLine();
       fileName = processFileName(fileName);
@@ -275,8 +274,7 @@ public class Fat32 implements SistemaArquivos{
       System.out.println("#------------ Append File: ------------ #");
       System.out.println("| File Name: ");
 
-      scan.nextLine();
-      fileName = scan.next();
+      fileName = scan.nextLine();
       fileName = processFileName(fileName);
 
       System.out.println("| Content: ");
@@ -312,10 +310,12 @@ public class Fat32 implements SistemaArquivos{
                       splitedFileName[1] = splitedFileName[1].substring(0, 3);
               }
           } catch (ArrayIndexOutOfBoundsException q) {
-              System.out.println("# processFileName() ERROR:");
+              System.out.println("@ processFileName() ERROR:");
           }
           String newName = splitedFileName[0] + "." + splitedFileName[1];
+          System.out.println("@ processFileName: "+newName);
           return newName;
+
       }
       else{
           return "fail";

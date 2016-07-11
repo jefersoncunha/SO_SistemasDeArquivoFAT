@@ -50,7 +50,7 @@ public class DriverDisco {
       rf.seek(nBloco * TAM_BLOCO);
       rf.write(dados);
       rf.getChannel().force(true);
-      System.out.println("[DISCO]: " +nBloco);
+      System.out.println("| [DISCO]: " +nBloco);
     }
 
     public byte[] leBloco(int nBloco) throws IOException{
