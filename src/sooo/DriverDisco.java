@@ -66,7 +66,7 @@ public class DriverDisco {
 
 /*
 | freeBlock() procura blocos livres no disco, da possicao 0 a 200;
-| faco() faz uma pesquisa aleatoria para encontrar blocos livres
+| loop() faz uma pesquisa aleatoria para encontrar blocos livres
 | condicao(tryRandom) vamos busca sequencial caso n tenha encontrado na busca aleatoria
 */
     public int freeBlock() throws IOException {
