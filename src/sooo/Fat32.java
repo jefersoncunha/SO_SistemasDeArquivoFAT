@@ -1,4 +1,3 @@
-
 package sooo;
 
 import java.io.ByteArrayOutputStream;
@@ -118,10 +117,10 @@ public class Fat32 implements SistemaArquivos{
         int fileSize     = diretorioRaiz.get(found).tamanho;
         int firstBlock   = diretorioRaiz.get(found).primeiroBloco;
         if(fileSize < TAM_BLOCOS) {
-            byte[] dados = disco.leBloco(firstBlock);
+            byte[] dice = disco.leBloco(firstBlock);
             if((fileSize + data.length) <= TAM_BLOCOS) {
-                System.arraycopy(data, 0, dados, fileSize+1, data.length);
-                disco.escreveBloco(firstBlock, dados);
+                System.arraycopy(data, 0, dice, fileSize+1, data.length);
+                disco.escreveBloco(firstBlock, dice);
                 diretorioRaiz.get(found).tamanho += data.length;
                 escreveDiretorio();
             } else
@@ -135,17 +134,13 @@ public class Fat32 implements SistemaArquivos{
 
   @Override
   public byte[] read(String fileName, int offset, int limit) {
-    int primeiroBloco = -1;
-    for(int i=0; i<diretorioRaiz.size() && primeiroBloco == -1; i++){
-        if(diretorioRaiz.get(i).nomeArquivo.equals(fileName)){
-            primeiroBloco = diretorioRaiz.get(i).primeiroBloco;
-        }
-    }
+    int found = findNumber(fileName);
+    int firstBlock = diretorioRaiz.get(found).primeiroBloco;
     try {
-        ByteBuffer dados = ByteBuffer.wrap(disco.leBloco(primeiroBloco));
-        byte[] texto = new byte[limit-offset];
-        System.arraycopy(dados.array(), offset, texto, 0, (limit-offset));
-        return texto;
+        ByteBuffer dice = ByteBuffer.wrap(disco.leBloco(firstBlock));
+        byte[] text = new byte[limit-offset];
+        System.arraycopy(dice.array(), offset, text, 0, (limit-offset));
+        return text;
 
     } catch (IOException ex) { }
 
@@ -159,13 +154,23 @@ public class Fat32 implements SistemaArquivos{
 */
   @Override
   public void remove(String fileName) {
+
+      int found = findNumber(fileName);
+      int firstBlock = diretorioRaiz.get(found).primeiroBloco;
+      int block = firstBlock;
       try {
-          int found = findNumber(fileName);
-          FAT[diretorioRaiz.get(found).primeiroBloco]= -1;
-          diretorioRaiz.remove(found);
-          escreveDiretorio();
-          escreveFAT();
-      } catch (IOException ex) {}
+        while(FAT[block] != 0){
+            block = FAT[firstBlock];
+            FAT[firstBlock] = -1;
+            disco.escreveBloco(firstBlock, new byte[] {0});
+            firstBlock = block;
+        }
+        FAT[block] = -1;
+        disco.escreveBloco(firstBlock, new byte[] {0});
+        diretorioRaiz.remove(found);
+        escreveDiretorio();
+        escreveFAT();
+        } catch (IOException ex) { }
   }
 
   @Override
@@ -178,6 +183,8 @@ public class Fat32 implements SistemaArquivos{
       }
       return espaco;
   }
+
+
 
   private void formataDisco() throws IOException {
       criaDiretorio();
@@ -210,7 +217,7 @@ public class Fat32 implements SistemaArquivos{
 
   private void escreveDiretorio() throws IOException {
       ByteBuffer b = ByteBuffer.allocate(TAM_BLOCOS);
-      int bloco = 0;
+      int block = 0;
       b.putInt(diretorioRaiz.size());
       for(int i=0; i < diretorioRaiz.size(); i++){
           for(int j=0; j<12; j++){
@@ -220,11 +227,11 @@ public class Fat32 implements SistemaArquivos{
           b.putInt(diretorioRaiz.get(i).tamanho);
           b.putInt(diretorioRaiz.get(i).primeiroBloco);
           if(b.position() == TAM_BLOCOS){
-              disco.escreveBloco(bloco, b.array());
-              bloco++;
+              disco.escreveBloco(block, b.array());
+              block++;
           }
       }
-      disco.escreveBloco(bloco, b.array());
+      disco.escreveBloco(block, b.array());
   }
 
   private void criaFat() throws IOException {
@@ -338,11 +345,16 @@ public class Fat32 implements SistemaArquivos{
 
   public void removeFile(){
     int foundName;
+    int fspace = freeSpace();
     System.out.println("#------------ Remove File: ------------ #");
-    do{
-      foundName = findName();
-    }while(foundName < 0 );
-    remove(diretorioRaiz.get(foundName).nomeArquivo);
+    if(fspace/1024 == 12672){
+        System.out.println("#------------ Drive empty!! ------------ #");
+    }else{
+        do{
+          foundName = findName();
+        }while(foundName < 0 );
+        remove(diretorioRaiz.get(foundName).nomeArquivo);
+    }
   }
 
   public int findName(){
