@@ -12,6 +12,8 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Fat32 implements SistemaArquivos{
 
@@ -151,9 +153,16 @@ public class Fat32 implements SistemaArquivos{
     return null;
   }
 
+/*
+| Encontrar o Elemento que deseja remover buscando o nome
+| Remover o Elemento do ArrayList<EntradaDiretorio> diretorioRaiz
+| Remove da FAT o indice do arquivo desejado
+*/
   @Override
   public void remove(String fileName) {
-      throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+      int found = findNumber(fileName);
+      diretorioRaiz.remove(found);
+      FAT[diretorioRaiz.get(found).primeiroBloco]= -1;
   }
 
   @Override
@@ -319,8 +328,14 @@ public class Fat32 implements SistemaArquivos{
   }
 
   public void removeFile(){
-
+    int foundName;
+    System.out.println("#------------ Remove File: ------------ #");
+    do{
+      foundName = findName();
+    }while(foundName < 0 );
+    remove(diretorioRaiz.get(foundName).nomeArquivo);
   }
+
   public int findName(){
     Scanner scan = new Scanner(System.in);
     System.out.println("| Insert Name to find: ");
