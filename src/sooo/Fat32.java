@@ -56,15 +56,9 @@ public class Fat32 implements SistemaArquivos{
       if(option ==1) createFile();
       else if(option ==2) appendFile();
       else if(option ==3) readFile();
+      else if(option ==4) removeFile();
       else if(option ==5) showDirectory();
       else if(option ==6) showfreeSpace();
-      else if(option ==7){
-        int valor = findName();
-        System.out.println("| findName"+valor);
-      }
-
-
-
     }while(option != 0);
 
   }
@@ -77,7 +71,6 @@ public class Fat32 implements SistemaArquivos{
     byte[] dataItem = new byte[TAM_BLOCOS];
     int[] freeBlocks = new int[blockAmount];  // lista dos blocos que este arquivo vai ocupar
 
-
     try {
       int freeBlock = disco.freeBlock();  // encontra um bloco livre
       if(freeBlock <= 1 || freeBlock > NUM_BLOCOS)
@@ -89,8 +82,10 @@ public class Fat32 implements SistemaArquivos{
         dir.setPrimeiroBloco(freeBlock);
         diretorioRaiz.add(dir);
 
-      if(fileSize > TAM_BLOCOS){
-
+      if(fileSize < TAM_BLOCOS){
+        FAT[freeBlock] = 0;
+        disco.escreveBloco(freeBlock, data);
+      } else {
           for(int i=0; i<blockAmount; i++){
               freeBlocks[i] = freeBlock;
               freeBlock = disco.freeBlock();
@@ -108,9 +103,6 @@ public class Fat32 implements SistemaArquivos{
               disco.escreveBloco(freeBlocks[i], dataItem);
           }
           FAT[freeBlocks[blockAmount-1]] = 0;
-      } else {
-          FAT[freeBlock] = 0;
-          disco.escreveBloco(freeBlock, data);
       }
       escreveDiretorio();
       escreveFAT();
@@ -326,6 +318,9 @@ public class Fat32 implements SistemaArquivos{
     append(diretorioRaiz.get(foundName).nomeArquivo, data);
   }
 
+  public void removeFile(){
+
+  }
   public int findName(){
     Scanner scan = new Scanner(System.in);
     System.out.println("| Insert Name to find: ");
