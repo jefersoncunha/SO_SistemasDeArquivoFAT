@@ -290,7 +290,7 @@ public class Fat32 implements SistemaArquivos{
     }
 
 
-    public static String processFileName(String fileName) {
+    public String processFileName(String fileName) {
       char analyse[] = fileName.toCharArray();
       boolean check = false;
       for (char a : analyse) {
@@ -329,7 +329,7 @@ public class Fat32 implements SistemaArquivos{
       System.out.println("#------------ Show Directory: ------------ #");
       for(int i=0; i<diretorioRaiz.size(); i++){
           System.out.println("|------------ FILE: "+i+" ------------ \n|");
-          System.out.println("| Name : " +diretorioRaiz.get(i).nomeArquivo);
+          System.out.println("| Name : " +printProcessedName(diretorioRaiz.get(i).nomeArquivo));
           System.out.println("| Size : " +diretorioRaiz.get(i).tamanho);
           System.out.println("| Block: " +diretorioRaiz.get(i).primeiroBloco+"\n");
       }
@@ -339,6 +339,17 @@ public class Fat32 implements SistemaArquivos{
               System.out.println("| FAT[" +i +"]: " +FAT[i]);
       }
 
+    }
+    
+    public String printProcessedName(String fileName){
+        char analyse[] = fileName.toCharArray();
+        String name = "";
+        for (char a : analyse){
+            if (a != '_'){
+                name = name + a;
+            }  
+        }
+        return name;
     }
 
     private class EntradaDiretorio {
