@@ -39,7 +39,6 @@ public class Fat32 implements SistemaArquivos{
       }
   }
 
-
   private void casoTeste() {
     int option;
     Scanner scan = new Scanner(System.in);
@@ -68,13 +67,13 @@ public class Fat32 implements SistemaArquivos{
   @Override
   public void create(String fileName, byte[] data) {
     ByteBuffer dice = ByteBuffer.wrap(data);
-    int fileSize = dice.capacity();  // tamanho total do arquivo
-    int blockAmount = (fileSize/TAM_BLOCOS) + 1;  // quantidade de blocos que ele ocupa
+    int fileSize = dice.capacity();
+    int blockAmount = (fileSize/TAM_BLOCOS) + 1;
     byte[] dataItem = new byte[TAM_BLOCOS];
-    int[] freeBlocks = new int[blockAmount];  // lista dos blocos que este arquivo vai ocupar
+    int[] freeBlocks = new int[blockAmount];
 
     try {
-      int freeBlock = disco.freeBlock();  // encontra um bloco livre
+      int freeBlock = disco.freeBlock();
       if(freeBlock <= 1 || freeBlock > NUM_BLOCOS)
         throw new IllegalStateException("Bloco invalido");
 
@@ -305,6 +304,12 @@ public class Fat32 implements SistemaArquivos{
       System.out.println("| Ex: file.txt \n| FileName: ");
       fileName = scan.nextLine();
       fileName = processFileName(fileName);
+
+      int found = findNumber(fileName);
+      if(found != -1 ){
+        fileName = "fail";
+        System.out.println("@ createFile error: sorry this name has been take :(");
+      }
     }while(fileName.equals("fail"));
 
     System.out.println("| File Content : ");
