@@ -160,9 +160,13 @@ public class Fat32 implements SistemaArquivos{
 */
   @Override
   public void remove(String fileName) {
-      int found = findNumber(fileName);
-      diretorioRaiz.remove(found);
-      FAT[diretorioRaiz.get(found).primeiroBloco]= -1;
+      try {
+          int found = findNumber(fileName);
+          FAT[diretorioRaiz.get(found).primeiroBloco]= -1;
+          diretorioRaiz.remove(found);
+          escreveDiretorio();
+          escreveFAT();
+      } catch (IOException ex) {}
   }
 
   @Override
