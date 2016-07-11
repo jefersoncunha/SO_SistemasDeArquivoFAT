@@ -46,6 +46,7 @@ unidade de armazenamento secundária. Através das chamadas à interface será p
 os usuários operem o sistema de arquivos.
 
 Observações:
+
 * Deverá ser desenvolvido em linguagem Java utilizando a classe RandomAccessFile e a
 chamada seek(pos) para busca e leitura/gravação de blocos inteiros;
 
