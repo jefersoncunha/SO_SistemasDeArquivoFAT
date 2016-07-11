@@ -55,13 +55,9 @@ public class Fat32 implements SistemaArquivos{
         System.out.println("\n Make Your Choice: ");
         option = scan.nextInt();
 
-        switch(option){
-          case 1:{ createFile(); }
-          case 2:{ appendFile(); }
-          case 3:{ }
-          case 4:{ }
-          case 5:{ showDirectory(); }
-        };
+        if(option ==1) createFile();
+        else if(option ==2) appendFile();
+        else if(option ==5) showDirectory();
 
       }while(option != 0);
 
@@ -280,8 +276,10 @@ public class Fat32 implements SistemaArquivos{
       System.out.println("| File Name: ");
 
       scan.nextLine();
-      fileName = scan.nextLine();
-      System.out.println("Conteudo: ");
+      fileName = scan.next();
+      fileName = processFileName(fileName);
+
+      System.out.println("| Content: ");
       fileContent = scan.nextLine();
 
       byte[] data = fileContent.getBytes();
@@ -338,16 +336,16 @@ public class Fat32 implements SistemaArquivos{
           if(FAT[i] != -1 )
               System.out.println("| FAT[" +i +"]: " +FAT[i]);
       }
-
+      System.out.println("\n");
     }
-    
+
     public String printProcessedName(String fileName){
         char analyse[] = fileName.toCharArray();
         String name = "";
         for (char a : analyse){
             if (a != '_'){
                 name = name + a;
-            }  
+            }
         }
         return name;
     }
