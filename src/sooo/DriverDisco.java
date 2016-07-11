@@ -4,6 +4,8 @@ package sooo;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
+import java.util.Random;
 
 public class DriverDisco {
 
@@ -71,13 +73,13 @@ public class DriverDisco {
       int blockNumber;
       int tryRandom = 0;
       Random rand = new Random();
-      ByteBuffer bloco = ByteBuffer.allocate(TAM_BLOCO);
+      ByteBuffer block = ByteBuffer.allocate(TAM_BLOCO);
 
       do{
           blockNumber = rand.nextInt(194)+5;
           block = ByteBuffer.wrap(leBloco(blockNumber));
           tryRandom++;
-      }while(bloco.getInt() != 0 && tryRandom < NUM_BLOCO);
+      }while(block.getInt() != 0 && tryRandom < NUM_BLOCO);
 
       if(tryRandom >= NUM_BLOCO){
           blockNumber = -1;
