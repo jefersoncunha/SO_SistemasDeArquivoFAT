@@ -63,6 +63,7 @@ o Bloco Inicial: inteiro de 32 bits.
 
 * Os próximos blocos serão usados para o armazenamento da FAT (calcular a
 quantidade de blocos necessários de acordo com o tamanho do arquivo);
+
 * Operações inválidas geram exceções como por exemplo: tentar ler um arquivo além
 do seu tamanho, tentar gravar mais dados do que o espaço livre permite, etc.
 
